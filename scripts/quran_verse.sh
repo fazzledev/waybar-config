@@ -22,6 +22,7 @@ fi
 
 verse_key=$(echo "$response" | /usr/bin/jq -r '.verse.verse_key')
 translation=$(echo "$response" | /usr/bin/jq -r '.verse.translations[0].text')
+uthmani_text=$(echo "$response" | /usr/bin/jq -r '.verse.text_uthmani')
 
 if [ "$DEBUG" = true ]; then
     echo "DEBUG: Verse key: $verse_key" >&2
@@ -70,13 +71,13 @@ fi
 
 # Properly escape JSON values
 display_text_escaped=$(echo "$display_text" | sed 's/"/\\"/g')
-verse_key_escaped=$(echo "$verse_key" | sed 's/"/\\"/g')
+uthmani_escaped=$(echo "$uthmani_text" | sed 's/"/\\"/g')
 translation_escaped=$(echo "$clean_translation" | sed 's/"/\\"/g')
 
 if [ "$DEBUG" = true ]; then
     echo "DEBUG: Final JSON output:" >&2
 fi
 
-echo "{\"text\": \"$display_text_escaped\", \"alt\": \"$verse_key_escaped\", \"tooltip\": \"$translation_escaped\"}"
+echo "{\"text\": \"$display_text_escaped\", \"alt\": \"$uthmani_escaped\", \"tooltip\": \"$translation_escaped\"}"
 
 
