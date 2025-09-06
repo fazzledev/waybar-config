@@ -48,9 +48,9 @@ if [ "$DEBUG" = true ]; then
 fi
 
 # Create carousel effect by truncating long text and adding ellipsis
-if [ ${#clean_verse} -gt 45 ]; then
+if [ ${#clean_verse} -gt 95 ]; then
     # Show first 45 characters with ellipsis, then verse number
-    display_text="${clean_verse:0:45}..."
+    display_text="${clean_verse:0:95}..."
     if [ "$DEBUG" = true ]; then
         echo "DEBUG: Text truncated to: $display_text" >&2
     fi
