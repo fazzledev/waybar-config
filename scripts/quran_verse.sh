@@ -37,7 +37,10 @@ clean_verse=$(echo "$translation" | \
     sed 's/[.,;:!]//g' | \
     sed 's/  */ /g' | \
     sed 's/^ *//' | \
-    sed 's/ *$//')
+    sed 's/ *$//' | \
+    sed 's/<sup[^>]*>//g' | \
+    sed 's/<\/sup>//g' | \
+    sed 's/<[^>]*>//g')
 
 if [ "$DEBUG" = true ]; then
     echo "DEBUG: Cleaned verse: $clean_verse" >&2
@@ -47,21 +50,29 @@ fi
 # Create carousel effect by truncating long text and adding ellipsis
 if [ ${#clean_verse} -gt 45 ]; then
     # Show first 45 characters with ellipsis, then verse number
-    display_text="${clean_verse:0:45}... ($verse_key)"
+    display_text="${clean_verse:0:45}..."
     if [ "$DEBUG" = true ]; then
         echo "DEBUG: Text truncated to: $display_text" >&2
     fi
 else
-    display_text="$clean_verse ($verse_key)"
+    display_text="$clean_verse"
     if [ "$DEBUG" = true ]; then
         echo "DEBUG: Text not truncated" >&2
     fi
 fi
 
+# Clean translation for tooltip (remove HTML markup)
+clean_translation=$(echo "$translation" | \
+    sed 's/<[^>]*>//g' | \
+    sed 's/\[[^]]*\]//g' | \
+    sed 's/  */ /g' | \
+    sed 's/^ *//' | \
+    sed 's/ *$//')
+
 # Properly escape JSON values
 display_text_escaped=$(echo "$display_text" | sed 's/"/\\"/g')
 verse_key_escaped=$(echo "$verse_key" | sed 's/"/\\"/g')
-translation_escaped=$(echo "$translation" | sed 's/"/\\"/g')
+translation_escaped=$(echo "$clean_translation" | sed 's/"/\\"/g')
 
 if [ "$DEBUG" = true ]; then
     echo "DEBUG: Final JSON output:" >&2

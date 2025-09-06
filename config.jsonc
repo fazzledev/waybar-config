@@ -67,9 +67,9 @@
     "exec": "~/.config/waybar/scripts/quran_verse.sh",
     "return-type": "json",
     "interval": 300,
-    "format": "{text}",
+    "format": "{text} ({alt})",
     "tooltip": true,
-    "on-click": "xdg-open https://quran.com/$(~/.config/waybar/scripts/quran_verse.sh | jq -r '.alt' | sed 's/:/\\//')"
+    "on-click": "xdg-open https://quran.com"
   },
   "clock": {
     "format": "{:%A %H:%M %d %B W%V %Y}",
