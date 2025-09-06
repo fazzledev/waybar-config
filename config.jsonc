@@ -69,8 +69,9 @@
     "return-type": "json",
     "interval": 300,
     "format": "{text}",
-    "format-alt": "{alt}",
-    "tooltip": true
+    "tooltip": true,
+    "on-click": "xdg-open https://quran.com/$(jq -r '.verse.verse_key' /tmp/quran_verse_cache.json)",
+    "on-click-right": "rm -f /tmp/quran_verse_cache.json"
   },
   "clock": {
     "format": "{:%H:%M %dth}",

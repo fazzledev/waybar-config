@@ -8,12 +8,22 @@ fi
 
 API_URL="https://api.quran.com/api/v4"
 RANDOM_VERSE_ENDPOINT="/verses/random?translations=20&fields=text_uthmani"
+CACHE_FILE="/tmp/quran_verse_cache.json"
+CACHE_TTL=300  # seconds (5 minutes)
 
-if [ "$DEBUG" = true ]; then
-    echo "DEBUG: Fetching verse from API..." >&2
+# Check if cache is fresh
+if [ -f "$CACHE_FILE" ] && [ $(($(date +%s) - $(stat -c %Y "$CACHE_FILE"))) -lt $CACHE_TTL ]; then
+    if [ "$DEBUG" = true ]; then
+        echo "DEBUG: Using cached verse..." >&2
+    fi
+    response=$(cat "$CACHE_FILE")
+else
+    if [ "$DEBUG" = true ]; then
+        echo "DEBUG: Fetching new verse from API..." >&2
+    fi
+    response=$(/usr/bin/curl -s "$API_URL$RANDOM_VERSE_ENDPOINT")
+    echo "$response" > "$CACHE_FILE"
 fi
-
-response=$(/usr/bin/curl -s "$API_URL$RANDOM_VERSE_ENDPOINT")
 
 if [ "$DEBUG" = true ]; then
     echo "DEBUG: Raw API response:" >&2
