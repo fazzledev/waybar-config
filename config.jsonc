@@ -64,7 +64,12 @@
     "on-click": "alacritty -e btop"
   },
   "custom/soul": {
-    "format": "Alhamdulillah!"
+    "exec": "~/.config/waybar/scripts/quran_verse.sh",
+    "return-type": "json",
+    "interval": 10,
+    "format": "{text}",
+    "tooltip": true,
+    "on-click": "xdg-open https://quran.com/{alt}"
   },
   "clock": {
     "format": "{:%A %H:%M %d %B W%V %Y}",
