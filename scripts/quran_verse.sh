@@ -47,20 +47,6 @@ if [ "$DEBUG" = true ]; then
     echo "DEBUG: Clean verse length: ${#clean_verse}" >&2
 fi
 
-# Create carousel effect by truncating long text and adding ellipsis
-if [ ${#clean_verse} -gt 95 ]; then
-    # Show first 45 characters with ellipsis, then verse number
-    display_text="${clean_verse:0:95}..."
-    if [ "$DEBUG" = true ]; then
-        echo "DEBUG: Text truncated to: $display_text" >&2
-    fi
-else
-    display_text="$clean_verse"
-    if [ "$DEBUG" = true ]; then
-        echo "DEBUG: Text not truncated" >&2
-    fi
-fi
-
 # Clean translation for tooltip (remove HTML markup)
 clean_translation=$(echo "$translation" | \
     sed 's/<[^>]*>//g' | \
@@ -68,6 +54,19 @@ clean_translation=$(echo "$translation" | \
     sed 's/  */ /g' | \
     sed 's/^ *//' | \
     sed 's/ *$//')
+
+# Create display text from first 95 characters of tooltip
+if [ ${#clean_translation} -gt 95 ]; then
+    display_text="${clean_translation:0:95}..."
+    if [ "$DEBUG" = true ]; then
+        echo "DEBUG: Text truncated to: $display_text" >&2
+    fi
+else
+    display_text="$clean_translation"
+    if [ "$DEBUG" = true ]; then
+        echo "DEBUG: Text not truncated" >&2
+    fi
+fi
 
 # Properly escape JSON values
 display_text_escaped=$(echo "$display_text" | sed 's/"/\\"/g')
