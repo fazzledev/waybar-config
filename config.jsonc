@@ -69,7 +69,7 @@
     "interval": 10,
     "format": "{text}",
     "tooltip": true,
-    "on-click": "xdg-open https://quran.com/{alt}"
+    "on-click": "xdg-open https://quran.com/$(~/.config/waybar/scripts/quran_verse.sh | jq -r '.alt' | sed 's/:/\\//')"
   },
   "clock": {
     "format": "{:%A %H:%M %d %B W%V %Y}",
