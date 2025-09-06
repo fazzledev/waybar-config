@@ -28,8 +28,16 @@ if [ "$DEBUG" = true ]; then
     echo "DEBUG: Original translation: $translation" >&2
 fi
 
-# Get the whole verse and remove special characters and symbols
-clean_verse=$(echo "$translation" | sed 's/[^a-zA-Z0-9 ]//g' | sed 's/  */ /g' | sed 's/^ *//' | sed 's/ *$//')
+# Get the whole verse and clean it intelligently
+clean_verse=$(echo "$translation" | \
+    sed 's/<[^>]*>//g' | \
+    sed 's/\[[^]]*\]//g' | \
+    sed 's/"[^"]*"//g' | \
+    sed 's/[()]//g' | \
+    sed 's/[.,;:!]//g' | \
+    sed 's/  */ /g' | \
+    sed 's/^ *//' | \
+    sed 's/ *$//')
 
 if [ "$DEBUG" = true ]; then
     echo "DEBUG: Cleaned verse: $clean_verse" >&2
