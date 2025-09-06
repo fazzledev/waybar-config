@@ -4,10 +4,11 @@
   "position": "top",
   "spacing": 0,
   "height": 26,
-  "modules-left": ["custom/omarchy", "hyprland/workspaces"],
-  "modules-center": ["custom/soul", "clock", "custom/update"],
+  "modules-left": ["custom/omarchy", "hyprland/workspaces", "custom/update"],
+  "modules-center": ["custom/soul"],
   "modules-right": [
     "group/tray-expander",
+    "clock",
     "bluetooth",
     "network",
     "pulseaudio",
@@ -72,7 +73,8 @@
     "on-click": "xdg-open https://quran.com"
   },
   "clock": {
-    "format": "{:%A %H:%M %d %B W%V %Y}",
+    "format": "{:%H:%M %dth}",
+    "format-alt": "{:%a %b w%V %Y}",
     "tooltip": false,
     "on-click-right": "omarchy-cmd-tzupdate"
   },
