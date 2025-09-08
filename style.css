@@ -37,7 +37,8 @@
 #bluetooth,
 #pulseaudio,
 #custom-omarchy,
-#custom-update {
+#custom-update,
+#custom-mouse_battery {
   min-width: 12px;
   margin: 0 7.5px;
 }
