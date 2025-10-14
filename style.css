@@ -38,7 +38,8 @@
 #pulseaudio,
 #custom-omarchy,
 #custom-update,
-#custom-mouse_battery {
+#custom-mouse_battery,
+#custom-screenrecording-indicator {
   min-width: 12px;
   margin: 0 7.5px;
 }
@@ -62,4 +63,14 @@ tooltip {
 
 .hidden {
   opacity: 0;
+}
+
+#custom-screenrecording-indicator {
+  min-width: 12px;
+  margin-left: 8.75px;
+  font-size: 10px;
+}
+
+#custom-screenrecording-indicator.active {
+  color: #a55555;
 }
