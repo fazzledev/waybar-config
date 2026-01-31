@@ -84,3 +84,21 @@ tooltip {
 #custom-voxtype.recording {
   color: #a55555;
 }
+
+/* Battery states */
+#battery.charging,
+#battery.plugged {
+  color: #50fa7b; /* bright green */
+}
+
+#battery.discharging {
+  color: #ffff55; /* bright yellow */
+}
+
+#battery.warning {
+  color: #ffb86c; /* bright orange */
+}
+
+#battery.critical {
+  color: #ff5555; /* bright red */
+}
