@@ -80,6 +80,7 @@
     "exec": "~/.config/waybar/scripts/clock_ordinal.sh",
     "interval": 1,
     "tooltip": false,
+    "on-click": "~/.config/waybar/scripts/clock_toggle.sh",
     "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select"
   },
   "network": {
