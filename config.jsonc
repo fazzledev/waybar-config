@@ -8,7 +8,7 @@
   "modules-center": ["custom/soul"],
   "modules-right": [
     "group/tray-expander",
-    "clock",
+    "custom/clock",
     "bluetooth",
     "network",
     "pulseaudio",
@@ -76,9 +76,9 @@
     "on-click": "omarchy-launch-webapp https://quran.com/$(jq -r '.verse.verse_key' /tmp/quran_verse_cache.json)",
     "on-click-right": "rm -f /tmp/quran_verse_cache.json"
   },
-  "clock": {
-    "format": "{:%H:%M %dth}",
-    "format-alt": "{:%a %b w%V %Y}",
+  "custom/clock": {
+    "exec": "~/.config/waybar/scripts/clock_ordinal.sh",
+    "interval": 1,
     "tooltip": false,
     "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select"
   },
