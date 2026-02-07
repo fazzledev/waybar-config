@@ -6,9 +6,16 @@
     "position": "top",
     "spacing": 0,
     "height": 26,
-    "modules-left": [],
+    "modules-left": ["custom/salah"],
     "modules-center": ["custom/soul-full"],
     "modules-right": [],
+    "custom/salah": {
+      "exec": "~/.config/waybar/scripts/salah_times.sh",
+      "return-type": "json",
+      "interval": 60,
+      "format": "{text}",
+      "tooltip": true
+    },
     "custom/soul-full": {
       "exec": "~/.config/waybar/scripts/quran_verse_full.sh",
       "return-type": "json",
