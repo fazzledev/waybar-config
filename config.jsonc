@@ -4,8 +4,8 @@
   "position": "top",
   "spacing": 0,
   "height": 26,
-  "modules-left": ["custom/omarchy", "hyprland/workspaces", "custom/update"],
-  "modules-center": ["custom/soul", "custom/screenrecording-indicator"],
+  "modules-left": ["custom/omarchy", "hyprland/workspaces", "custom/update", "custom/voxtype", "custom/screenrecording-indicator"],
+  "modules-center": ["custom/soul"],
   "modules-right": [
     "group/tray-expander",
     "custom/clock",
@@ -169,6 +169,6 @@
   },
   "tray": {
     "icon-size": 12,
-    "spacing": 12
+    "spacing": 17
   }
 }
