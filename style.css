@@ -122,9 +122,11 @@ tooltip {
 
 /* Salah times states */
 #custom-salah.warning {
-  color: #ffff55; /* yellow - prayer coming soon */
+  color: #ffaa00; /* amber - visible on light and dark */
+  font-weight: bold;
 }
 
 #custom-salah.urgent {
-  color: #ff5555; /* red - prayer time just passed */
+  color: #d03030; /* red - prayer time just passed */
+  font-weight: bold;
 }
