@@ -82,7 +82,11 @@ tooltip {
 }
 
 #custom-screenrecording-indicator.ready {
-  color: #55a555;
+  color: #888888;
+}
+
+#custom-screenrecording-indicator.selecting {
+  color: #ffb86c;
 }
 
 #custom-screenrecording-indicator.active {
@@ -114,4 +118,13 @@ tooltip {
 
 #battery.critical {
   color: #ff5555; /* bright red */
+}
+
+/* Salah times states */
+#custom-salah.warning {
+  color: #ffff55; /* yellow - prayer coming soon */
+}
+
+#custom-salah.urgent {
+  color: #ff5555; /* red - prayer time just passed */
 }

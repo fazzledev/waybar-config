@@ -78,54 +78,77 @@ asr_mins=$(to_mins "$asr")
 maghrib_mins=$(to_mins "$maghrib")
 isha_mins=$(to_mins "$isha")
 
+# Prayer names and times in order (excluding sunrise for "just passed" check)
+prayers=("Fajr" "Sunrise" "Dhuhr" "Asr" "Maghrib" "Isha")
+times=("$fajr" "$fajr" "$dhuhr" "$asr" "$maghrib" "$isha")
+mins_arr=($fajr_mins $sunrise_mins $dhuhr_mins $asr_mins $maghrib_mins $isha_mins)
+
+# Check if a prayer just passed (within 30 mins) - skip Sunrise
+check_just_passed() {
+    local prayer_names=("Fajr" "Dhuhr" "Asr" "Maghrib" "Isha")
+    local prayer_mins=($fajr_mins $dhuhr_mins $asr_mins $maghrib_mins $isha_mins)
+
+    for i in "${!prayer_names[@]}"; do
+        local p_mins=${prayer_mins[$i]}
+        local mins_since=$((now_mins - p_mins))
+        if [ $mins_since -ge 0 ] && [ $mins_since -le 30 ]; then
+            echo "${prayer_names[$i]}|$mins_since"
+            return 0
+        fi
+    done
+    echo ""
+}
+
 # Find next prayer
-next_prayer=""
-next_time=""
-mins_until=0
-
-if [ $now_mins -lt $fajr_mins ]; then
-    next_prayer="Fajr"
-    next_time="$fajr"
-    mins_until=$((fajr_mins - now_mins))
-elif [ $now_mins -lt $sunrise_mins ]; then
-    next_prayer="Sunrise"
-    next_time="$sunrise"
-    mins_until=$((sunrise_mins - now_mins))
-elif [ $now_mins -lt $dhuhr_mins ]; then
-    next_prayer="Dhuhr"
-    next_time="$dhuhr"
-    mins_until=$((dhuhr_mins - now_mins))
-elif [ $now_mins -lt $asr_mins ]; then
-    next_prayer="Asr"
-    next_time="$asr"
-    mins_until=$((asr_mins - now_mins))
-elif [ $now_mins -lt $maghrib_mins ]; then
-    next_prayer="Maghrib"
-    next_time="$maghrib"
-    mins_until=$((maghrib_mins - now_mins))
-elif [ $now_mins -lt $isha_mins ]; then
-    next_prayer="Isha"
-    next_time="$isha"
-    mins_until=$((isha_mins - now_mins))
-else
-    # After Isha, next is Fajr tomorrow
-    next_prayer="Fajr"
-    next_time="$fajr"
-    mins_until=$((1440 - now_mins + fajr_mins))
-fi
-
-# Format countdown
-hours=$((mins_until / 60))
-mins=$((mins_until % 60))
-
-if [ $hours -gt 0 ]; then
-    countdown="${hours}h ${mins}m"
-else
-    countdown="${mins}m"
-fi
+find_next_prayer() {
+    if [ $now_mins -lt $fajr_mins ]; then
+        echo "Fajr|$fajr|$((fajr_mins - now_mins))"
+    elif [ $now_mins -lt $sunrise_mins ]; then
+        echo "Sunrise|$sunrise|$((sunrise_mins - now_mins))"
+    elif [ $now_mins -lt $dhuhr_mins ]; then
+        echo "Dhuhr|$dhuhr|$((dhuhr_mins - now_mins))"
+    elif [ $now_mins -lt $asr_mins ]; then
+        echo "Asr|$asr|$((asr_mins - now_mins))"
+    elif [ $now_mins -lt $maghrib_mins ]; then
+        echo "Maghrib|$maghrib|$((maghrib_mins - now_mins))"
+    elif [ $now_mins -lt $isha_mins ]; then
+        echo "Isha|$isha|$((isha_mins - now_mins))"
+    else
+        echo "Fajr|$fajr|$((1440 - now_mins + fajr_mins))"
+    fi
+}
 
 # Build tooltip with all times
 tooltip="Fajr: $fajr\nSunrise: $sunrise\nDhuhr: $dhuhr\nAsr: $asr\nMaghrib: $maghrib\nIsha: $isha"
 
-# Output JSON
-echo "{\"text\": \"󰥔 Coimbatore · $next_prayer in $countdown\", \"tooltip\": \"$tooltip\"}"
+# Check for just-passed prayer first
+just_passed=$(check_just_passed)
+
+if [ -n "$just_passed" ]; then
+    prayer_name=$(echo "$just_passed" | cut -d'|' -f1)
+    mins_ago=$(echo "$just_passed" | cut -d'|' -f2)
+    echo "{\"text\": \"󰥔 Coimbatore · $prayer_name ${mins_ago}m ago\", \"tooltip\": \"$tooltip\", \"class\": \"urgent\"}"
+else
+    # Get next prayer
+    next_info=$(find_next_prayer)
+    next_prayer=$(echo "$next_info" | cut -d'|' -f1)
+    next_time=$(echo "$next_info" | cut -d'|' -f2)
+    mins_until=$(echo "$next_info" | cut -d'|' -f3)
+
+    # Format countdown
+    hours=$((mins_until / 60))
+    mins=$((mins_until % 60))
+
+    if [ $hours -gt 0 ]; then
+        countdown="${hours}h ${mins}m"
+    else
+        countdown="${mins}m"
+    fi
+
+    # Determine class based on time remaining
+    if [ $mins_until -le 30 ]; then
+        echo "{\"text\": \"󰥔 Coimbatore · $next_prayer in $countdown\", \"tooltip\": \"$tooltip\", \"class\": \"warning\"}"
+    else
+        echo "{\"text\": \"󰥔 Coimbatore · $next_prayer in $countdown\", \"tooltip\": \"$tooltip\"}"
+    fi
+fi
