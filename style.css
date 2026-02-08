@@ -109,7 +109,8 @@ tooltip {
 /* Battery states */
 #battery.charging,
 #battery.plugged {
-  color: #50fa7b; /* bright green */
+  color: #2d9d2d; /* green - visible on light and dark */
+  font-weight: bold;
 }
 
 #battery.discharging {
