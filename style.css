@@ -86,11 +86,13 @@ tooltip {
 }
 
 #custom-screenrecording-indicator.selecting {
-  color: #ffb86c;
+  color: #ffaa00; /* amber */
+  font-weight: bold;
 }
 
 #custom-screenrecording-indicator.active {
-  color: #a55555;
+  color: #d03030; /* red */
+  font-weight: bold;
 }
 
 #custom-voxtype {
@@ -109,15 +111,18 @@ tooltip {
 }
 
 #battery.discharging {
-  color: #ffff55; /* bright yellow */
+  color: #ffaa00; /* amber - visible on light and dark */
+  font-weight: 900;
 }
 
 #battery.warning {
-  color: #ffb86c; /* bright orange */
+  color: #ffaa00; /* amber */
+  font-weight: bold;
 }
 
 #battery.critical {
-  color: #ff5555; /* bright red */
+  color: #d03030; /* red */
+  font-weight: bold;
 }
 
 /* Salah times states */
