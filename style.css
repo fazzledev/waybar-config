@@ -88,11 +88,19 @@ tooltip {
 #custom-screenrecording-indicator.selecting {
   color: #ffaa00; /* amber */
   font-weight: bold;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 #custom-screenrecording-indicator.active {
   color: #d03030; /* red */
   font-weight: bold;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  50% { opacity: 0.3; }
+  to { opacity: 1; }
 }
 
 #custom-voxtype {
