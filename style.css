@@ -81,6 +81,10 @@ tooltip {
   padding-bottom: 1px;
 }
 
+#custom-screenrecording-indicator.ready {
+  color: #55a555;
+}
+
 #custom-screenrecording-indicator.active {
   color: #a55555;
 }
