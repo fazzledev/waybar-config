@@ -127,9 +127,9 @@ tooltip {
   font-weight: bold;
 }
 
-#battery.discharging {
-  color: #ffaa00; /* amber - visible on light and dark */
-  font-weight: 900;
+#battery.low {
+  color: #ffaa00; /* amber */
+  font-weight: bold;
 }
 
 #battery.warning {
