@@ -42,7 +42,7 @@
 }
 
 #tray {
-  margin-right: 16px;
+  margin-right: 7.5px;
 }
 
 #bluetooth {
@@ -55,7 +55,7 @@
 }
 
 #custom-expand-icon {
-  margin-right: 7.5px;
+  margin: 0 7.5px;
   color: @foreground;
 }
 
@@ -77,8 +77,6 @@ tooltip {
 }
 
 #custom-screenrecording-indicator {
-  min-width: 12px;
-  margin-left: 5px;
   font-size: 10px;
   padding-bottom: 1px;
 }
