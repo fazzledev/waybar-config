@@ -42,7 +42,7 @@
 }
 
 #tray {
-  margin-right: 7.5px;
+  margin: 0 7.5px;
 }
 
 #bluetooth {
@@ -82,7 +82,7 @@ tooltip {
 }
 
 #custom-screenrecording-indicator.ready {
-  color: #888888;
+  color: @foreground;
 }
 
 #custom-screenrecording-indicator.selecting {
@@ -105,11 +105,19 @@ tooltip {
 
 #custom-voxtype {
   min-width: 12px;
-  margin: 0 0 0 7.5px;
+  margin: 0 7.5px;
 }
 
 #custom-voxtype.recording {
-  color: #a55555;
+  color: #d03030; /* red */
+  font-weight: bold;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+#custom-voxtype.transcribing {
+  color: #ffaa00; /* amber */
+  font-weight: bold;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 /* Battery states */

@@ -27,9 +27,9 @@ clean_translation=$(echo "$translation" | \
     sed 's/^ *//' | \
     sed 's/ *$//')
 
-# Create display text from first 150 characters
-if [ ${#clean_translation} -gt 150 ]; then
-    display_text="${clean_translation:0:150}..."
+# Create display text from first 180 characters
+if [ ${#clean_translation} -gt 180 ]; then
+    display_text="${clean_translation:0:180}..."
 else
     display_text="$clean_translation"
 fi

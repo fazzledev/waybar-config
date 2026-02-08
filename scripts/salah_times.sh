@@ -40,7 +40,7 @@ fi
 
 # Check if we have valid data
 if [ -z "$response" ] || [ "$response" = "null" ]; then
-    echo '{"text": "󰥔 --:--", "tooltip": "Prayer times unavailable"}'
+    echo '{"text": "--:--", "tooltip": "Prayer times unavailable"}'
     exit 0
 fi
 
@@ -54,7 +54,7 @@ isha=$(echo "$response" | jq -r '.timings.Isha' | cut -d' ' -f1)
 
 # Check if we got valid times
 if [ "$fajr" = "null" ] || [ -z "$fajr" ]; then
-    echo '{"text": "󰥔 --:--", "tooltip": "Invalid prayer times"}'
+    echo '{"text": "--:--", "tooltip": "Invalid prayer times"}'
     exit 0
 fi
 
@@ -119,7 +119,9 @@ find_next_prayer() {
 }
 
 # Build tooltip with all times
-tooltip="Fajr: $fajr\nSunrise: $sunrise\nDhuhr: $dhuhr\nAsr: $asr\nMaghrib: $maghrib\nIsha: $isha"
+tooltip=$(printf "Coimbatore\\\\n\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s" \
+    "Fajr" "$fajr" "Sunrise" "$sunrise" "Dhuhr" "$dhuhr" \
+    "Asr" "$asr" "Maghrib" "$maghrib" "Isha" "$isha")
 
 # Check for just-passed prayer first
 just_passed=$(check_just_passed)
@@ -127,7 +129,7 @@ just_passed=$(check_just_passed)
 if [ -n "$just_passed" ]; then
     prayer_name=$(echo "$just_passed" | cut -d'|' -f1)
     mins_ago=$(echo "$just_passed" | cut -d'|' -f2)
-    echo "{\"text\": \"󰥔 Coimbatore · $prayer_name ${mins_ago}m ago\", \"tooltip\": \"$tooltip\", \"class\": \"urgent\"}"
+    echo "{\"text\": \"$prayer_name ${mins_ago}m ago\", \"tooltip\": \"$tooltip\", \"class\": \"urgent\"}"
 else
     # Get next prayer
     next_info=$(find_next_prayer)
@@ -147,8 +149,8 @@ else
 
     # Determine class based on time remaining
     if [ $mins_until -le 30 ]; then
-        echo "{\"text\": \"󰥔 Coimbatore · $next_prayer in $countdown\", \"tooltip\": \"$tooltip\", \"class\": \"warning\"}"
+        echo "{\"text\": \"$next_prayer in $countdown\", \"tooltip\": \"$tooltip\", \"class\": \"warning\"}"
     else
-        echo "{\"text\": \"󰥔 Coimbatore · $next_prayer in $countdown\", \"tooltip\": \"$tooltip\"}"
+        echo "{\"text\": \"$next_prayer in $countdown\", \"tooltip\": \"$tooltip\"}"
     fi
 fi

@@ -33,16 +33,14 @@
     "position": "bottom",
     "spacing": 0,
     "height": 26,
-    "modules-left": ["custom/omarchy", "hyprland/workspaces", "custom/update", "custom/voxtype"],
+    "modules-left": ["custom/omarchy", "hyprland/workspaces", "custom/update"],
     "modules-center": ["custom/clock"],
     "modules-right": [
-      "custom/screenrecording-indicator",
       "group/tray-expander",
-      "bluetooth",
+      "custom/voxtype",
+      "custom/screenrecording-indicator",
       "network",
       "pulseaudio",
-      "cpu",
-      "custom/mouse_battery",
       "battery"
     ],
     "hyprland/workspaces": {
@@ -161,7 +159,7 @@
         "transition-duration": 600,
         "children-class": "tray-group-item"
       },
-      "modules": ["custom/expand-icon", "tray"]
+      "modules": ["custom/expand-icon", "bluetooth", "cpu", "custom/mouse_battery", "tray"]
     },
     "custom/expand-icon": {
       "format": "󰅁",
@@ -179,7 +177,7 @@
       "return-type": "json",
       "format": "{icon}",
       "format-icons": {
-        "idle": "",
+        "idle": "󰍬",
         "recording": "󰍬",
         "transcribing": "󰔟"
       },
@@ -189,7 +187,7 @@
     },
     "tray": {
       "icon-size": 12,
-      "spacing": 17
+      "spacing": 15
     }
   }
 ]
