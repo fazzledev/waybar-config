@@ -21,9 +21,15 @@
 
 #workspaces button {
   all: initial;
-  padding: 0 6px;
-  margin: 0 1.5px;
-  min-width: 9px;
+  padding: 0 4px;
+  margin: 0 1px;
+  min-width: 16px;
+  font-size: 10px;
+}
+
+#workspaces button.active {
+  font-weight: bold;
+  border-bottom: 2px solid @foreground;
 }
 
 #workspaces button.empty {
