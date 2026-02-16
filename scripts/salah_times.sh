@@ -5,20 +5,27 @@
 
 CACHE_FILE="/tmp/salah_times_cache.json"
 CACHE_TTL=3600  # 1 hour cache for prayer times
-
-# Coimbatore coordinates
-LAT="11.0168"
-LON="76.9558"
+LOCATION_CONFIG="$HOME/.config/waybar/location.json"
 METHOD="1"  # Muslim World League
+
+# Read location from shared config
+if [ -f "$LOCATION_CONFIG" ]; then
+    CITY=$(jq -r '.city' "$LOCATION_CONFIG")
+    COUNTRY=$(jq -r '.country' "$LOCATION_CONFIG")
+else
+    CITY="Chennai"
+    COUNTRY="India"
+fi
 
 # Get current date
 TODAY=$(date +%d-%m-%Y)
 
-# Check if cache is fresh and for today
+# Check if cache is fresh, for today, and for the current city
 if [ -f "$CACHE_FILE" ]; then
     CACHE_DATE=$(jq -r '.date.gregorian.date' "$CACHE_FILE" 2>/dev/null)
+    CACHE_CITY=$(jq -r '.meta.city // empty' "$CACHE_FILE" 2>/dev/null)
     CACHE_AGE=$(($(date +%s) - $(stat -c %Y "$CACHE_FILE")))
-    if [ "$CACHE_DATE" = "$TODAY" ] && [ $CACHE_AGE -lt $CACHE_TTL ]; then
+    if [ "$CACHE_DATE" = "$TODAY" ] && [ "$CACHE_CITY" = "$CITY" ] && [ $CACHE_AGE -lt $CACHE_TTL ]; then
         response=$(cat "$CACHE_FILE")
     else
         response=""
@@ -29,8 +36,7 @@ fi
 
 # Fetch new data if needed
 if [ -z "$response" ]; then
-    # Fetch prayer times from Aladhan
-    api_response=$(curl -sL --max-time 15 "https://api.aladhan.com/v1/timingsByCity?city=Coimbatore&country=India&method=$METHOD" 2>/dev/null)
+    api_response=$(curl -sL --max-time 15 "https://api.aladhan.com/v1/timingsByCity?city=${CITY}&country=${COUNTRY}&method=$METHOD" 2>/dev/null)
 
     if [ -n "$api_response" ]; then
         echo "$api_response" | jq '.data' > "$CACHE_FILE" 2>/dev/null
@@ -119,7 +125,7 @@ find_next_prayer() {
 }
 
 # Build tooltip with all times
-tooltip=$(printf "Coimbatore\\\\n\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s" \
+tooltip=$(printf "$CITY\\\\n\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s\\\\n%-8s %s" \
     "Fajr" "$fajr" "Sunrise" "$sunrise" "Dhuhr" "$dhuhr" \
     "Asr" "$asr" "Maghrib" "$maghrib" "Isha" "$isha")
 

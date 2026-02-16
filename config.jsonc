@@ -13,6 +13,7 @@
       "exec": "~/.config/waybar/scripts/salah_times.sh",
       "return-type": "json",
       "interval": 60,
+      "signal": 9,
       "format": "{text}",
       "tooltip": true
     },
@@ -34,7 +35,7 @@
     "spacing": 0,
     "height": 26,
     "modules-left": ["custom/omarchy", "hyprland/workspaces", "custom/update"],
-    "modules-center": ["custom/clock"],
+    "modules-center": ["custom/clock", "custom/location"],
     "modules-right": [
       "group/tray-expander",
       "custom/voxtype",
@@ -179,6 +180,15 @@
       "interval": 1,
       "signal": 8,
       "return-type": "json"
+    },
+    "custom/location": {
+      "exec": "~/.config/waybar/scripts/location.sh",
+      "return-type": "json",
+      "interval": "once",
+      "signal": 9,
+      "format": "{text}",
+      "tooltip": true,
+      "on-click": "~/.config/waybar/scripts/location.sh --cycle"
     },
     "custom/voxtype": {
       "exec": "omarchy-voxtype-status",
