@@ -1,25 +1,44 @@
 #!/bin/bash
 
 # Location display and cycling script for waybar
-# Reads from ~/.config/waybar/location.json
-# Call with --cycle to advance to the next city
+# Auto-detects city from IP on first run, click cycles through presets
+# Reads/writes ~/.config/waybar/location.json
 
 CONFIG="$HOME/.config/waybar/location.json"
 
-# Preset cities (add more here)
+# Preset cities for manual cycling (add more here)
 CITIES=("Chennai" "Coimbatore")
 COUNTRIES=("India" "India")
 
-# Ensure config exists
+# Auto-detect city from IP geolocation
+auto_detect() {
+    local geo
+    geo=$(curl -sL --max-time 5 "https://ipinfo.io/json" 2>/dev/null)
+    if [ -n "$geo" ]; then
+        local city country
+        city=$(echo "$geo" | jq -r '.city // empty')
+        country=$(echo "$geo" | jq -r '.country // empty')
+        if [ -n "$city" ] && [ -n "$country" ]; then
+            jq -n --arg city "$city" --arg country "$country" \
+                '{"city": $city, "country": $country}' > "$CONFIG"
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# Auto-detect on first run (no config file yet)
 if [ ! -f "$CONFIG" ]; then
-    echo '{"city": "Chennai", "country": "India"}' > "$CONFIG"
+    if ! auto_detect; then
+        echo '{"city": "Chennai", "country": "India"}' > "$CONFIG"
+    fi
 fi
 
 current_city=$(jq -r '.city' "$CONFIG")
 
 if [ "$1" = "--cycle" ]; then
-    # Find current index
-    idx=0
+    # Find current index (-1 if not in presets, e.g. auto-detected city)
+    idx=-1
     for i in "${!CITIES[@]}"; do
         if [ "${CITIES[$i]}" = "$current_city" ]; then
             idx=$i
@@ -27,7 +46,7 @@ if [ "$1" = "--cycle" ]; then
         fi
     done
 
-    # Advance to next city
+    # Advance to next preset city
     next_idx=$(( (idx + 1) % ${#CITIES[@]} ))
     next_city="${CITIES[$next_idx]}"
     next_country="${COUNTRIES[$next_idx]}"
