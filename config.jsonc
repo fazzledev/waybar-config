@@ -41,6 +41,7 @@
       "custom/voxtype",
       "custom/screenrecording-indicator",
       "network",
+      "backlight",
       "pulseaudio",
       "battery"
     ],
@@ -149,6 +150,12 @@
       "format-no-controller": "",
       "tooltip-format": "Devices connected: {num_connections}",
       "on-click": "omarchy-launch-bluetooth"
+    },
+    "backlight": {
+      "format": "{icon}",
+      "format-icons": ["󰃞", "󰃟", "󰃠"],
+      "scroll-step": 5,
+      "tooltip-format": "Brightness {percent}%"
     },
     "pulseaudio": {
       "format": "{icon}",

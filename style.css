@@ -64,6 +64,10 @@
   margin: 0 7.5px;
 }
 
+#backlight {
+  margin: 0 7.5px;
+}
+
 #custom-expand-icon {
   margin: 0 7.5px;
   color: @foreground;
