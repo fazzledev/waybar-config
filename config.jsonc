@@ -154,7 +154,7 @@
     "backlight": {
       "format": "{icon}",
       "format-icons": ["󰃞", "󰃟", "󰃠"],
-      "scroll-step": 5,
+      "scroll-step": 1,
       "tooltip-format": "Brightness {percent}%"
     },
     "pulseaudio": {
