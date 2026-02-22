@@ -103,7 +103,8 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       # Schedule auto-delete via systemd timer (cleans up all generated files)
       auto_delete=${auto_delete%.*}  # strip decimal from yad NUM field
       if [[ "$auto_delete_on" == "TRUE" && "$auto_delete" -gt 0 ]] 2>/dev/null; then
-        delete_cmd="rm -f '${original_file}'* /tmp/screenrecord-autodelete-deadline && notify-send 'Recording deleted' '$(basename "$original_file")' -t 2000"
+        base="${original_file%.mp4}"
+        delete_cmd="rm -f '${base}'*.mp4 /tmp/screenrecord-autodelete-deadline && notify-send 'Recording deleted' '$(basename "$original_file")' -t 2000"
         # Cancel any previous auto-delete timer
         systemctl --user stop screenrecord-autodelete.timer 2>/dev/null
         echo $(( $(date +%s) + auto_delete * 60 )) > /tmp/screenrecord-autodelete-deadline
