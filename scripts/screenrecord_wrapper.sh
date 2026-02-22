@@ -22,6 +22,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       --title="Save Screen Recording" \
       --text="Max ${MAX_CHARS} characters" \
       --field="File name" "" \
+      --field="Compress to 10MB:CHK" TRUE \
       --field="Skip frames:CHK" TRUE \
       --field="Copy path to clipboard:CHK" TRUE \
       --field="Auto-delete:CHK" TRUE \
@@ -32,10 +33,11 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
 
     if [[ $? -eq 0 ]]; then
       new_name=$(echo "$result" | sed -n '1p')
-      skip_frames=$(echo "$result" | sed -n '2p')
-      copy_path=$(echo "$result" | sed -n '3p')
-      auto_delete_on=$(echo "$result" | sed -n '4p')
-      auto_delete=$(echo "$result" | sed -n '5p')
+      compress=$(echo "$result" | sed -n '2p')
+      skip_frames=$(echo "$result" | sed -n '3p')
+      copy_path=$(echo "$result" | sed -n '4p')
+      auto_delete_on=$(echo "$result" | sed -n '5p')
+      auto_delete=$(echo "$result" | sed -n '6p')
 
       # Extract timestamp from original filename
       timestamp=$(basename "$recorded_file" .mp4 | sed 's/^screenrecording-//')
@@ -55,7 +57,28 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
         notify-send "Recording saved" "$(basename "$new_path")" -t 2000
       fi
 
-      # Apply post-processing
+      original_file="$recorded_file"
+
+      # Compress to 10MB
+      if [[ "$compress" == "TRUE" ]]; then
+        duration=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$recorded_file" 2>/dev/null)
+        duration=${duration%.*}
+        if [[ "$duration" -gt 0 ]] 2>/dev/null; then
+          target_bitrate=$(( 10 * 8 * 1024 / duration ))k
+          compressed="${recorded_file%.mp4}--compressed.mp4"
+          notify-send "Processing" "Compressing to 10MB..." -t 2000
+          ffmpeg -i "$recorded_file" -b:v "$target_bitrate" -maxrate "$target_bitrate" \
+            -bufsize "$(( 10 * 1024 ))k" "$compressed" -y 2>/dev/null
+          if [[ $? -eq 0 ]]; then
+            notify-send "Compression complete" "$(basename "$compressed")" -t 2000
+            recorded_file="$compressed"
+          else
+            notify-send "Compression failed" -u critical -t 3000
+          fi
+        fi
+      fi
+
+      # Skip frames
       if [[ "$skip_frames" == "TRUE" ]]; then
         base="${recorded_file%.mp4}"
         output="${base}--skipframes.mp4"
@@ -66,23 +89,21 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
           "$output" -y 2>/dev/null
         if [[ $? -eq 0 ]]; then
           notify-send "Frame skip complete" "$(basename "$output")" -t 2000
+          recorded_file="$output"
         else
           notify-send "Frame skip failed" -u critical -t 3000
         fi
       fi
 
-      # Copy file path to clipboard (skipframes version if it exists)
+      # Copy final file path to clipboard
       if [[ "$copy_path" == "TRUE" ]]; then
-        clip_path="${recorded_file%.mp4}--skipframes.mp4"
-        [[ ! -f "$clip_path" ]] && clip_path="$recorded_file"
-        echo -n "$clip_path" | wl-copy
+        echo -n "$recorded_file" | wl-copy
       fi
 
-      # Schedule auto-delete via systemd timer
+      # Schedule auto-delete via systemd timer (cleans up all generated files)
       auto_delete=${auto_delete%.*}  # strip decimal from yad NUM field
       if [[ "$auto_delete_on" == "TRUE" && "$auto_delete" -gt 0 ]] 2>/dev/null; then
-        skipfile="${recorded_file%.mp4}--skipframes.mp4"
-        delete_cmd="rm -f '$recorded_file' '$skipfile' && notify-send 'Recording deleted' '$(basename "$recorded_file")' -t 2000"
+        delete_cmd="rm -f '${original_file}'* && notify-send 'Recording deleted' '$(basename "$original_file")' -t 2000"
         # Cancel any previous auto-delete timer
         systemctl --user stop screenrecord-autodelete.timer 2>/dev/null
         systemd-run --user --unit=screenrecord-autodelete --on-active="${auto_delete}m" bash -c "$delete_cmd"
