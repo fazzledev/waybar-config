@@ -23,6 +23,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       --text="Max ${MAX_CHARS} characters" \
       --field="File name" "" \
       --field="Skip frames:CHK" TRUE \
+      --field="Copy path to clipboard:CHK" TRUE \
       --field="Auto-delete after (minutes):NUM" "3!0..60!1" \
       --separator=$'\n' \
       --width=400 \
@@ -31,7 +32,8 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
     if [[ $? -eq 0 ]]; then
       new_name=$(echo "$result" | sed -n '1p')
       skip_frames=$(echo "$result" | sed -n '2p')
-      auto_delete=$(echo "$result" | sed -n '3p')
+      copy_path=$(echo "$result" | sed -n '3p')
+      auto_delete=$(echo "$result" | sed -n '4p')
 
       # Extract timestamp from original filename
       timestamp=$(basename "$recorded_file" .mp4 | sed 's/^screenrecording-//')
@@ -65,6 +67,13 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
         else
           notify-send "Frame skip failed" -u critical -t 3000
         fi
+      fi
+
+      # Copy file path to clipboard (skipframes version if it exists)
+      if [[ "$copy_path" == "TRUE" ]]; then
+        clip_path="${recorded_file%.mp4}--skipframes.mp4"
+        [[ ! -f "$clip_path" ]] && clip_path="$recorded_file"
+        echo -n "$clip_path" | wl-copy
       fi
 
       # Schedule auto-delete via systemd timer
