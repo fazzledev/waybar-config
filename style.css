@@ -90,6 +90,11 @@ tooltip {
   opacity: 0;
 }
 
+#custom-autodelete-indicator {
+  margin: 0 7.5px;
+  color: #d03030;
+}
+
 #custom-screenrecording-indicator {
   font-size: 10px;
   padding-bottom: 1px;

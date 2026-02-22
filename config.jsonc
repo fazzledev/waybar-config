@@ -40,6 +40,7 @@
       "group/tray-expander",
       "custom/voxtype",
       "custom/screenrecording-indicator",
+      "custom/autodelete-indicator",
       "network",
       "backlight",
       "pulseaudio",
@@ -186,6 +187,12 @@
       "exec": "~/.config/waybar/scripts/screen_recording.sh",
       "interval": 1,
       "signal": 8,
+      "return-type": "json"
+    },
+    "custom/autodelete-indicator": {
+      "exec": "~/.config/waybar/scripts/autodelete_indicator.sh",
+      "on-click": "systemctl --user stop screenrecord-autodelete.timer 2>/dev/null && rm -f /tmp/screenrecord-autodelete-deadline && notify-send 'Auto-delete cancelled' -t 2000",
+      "interval": 1,
       "return-type": "json"
     },
     "custom/location": {
