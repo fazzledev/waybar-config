@@ -23,7 +23,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       --text="Max ${MAX_CHARS} characters" \
       --field="File name" "" \
       --field="Skip frames:CHK" TRUE \
-      --field="Auto-delete after (minutes):NUM" "0!0..60!1" \
+      --field="Auto-delete after (minutes):NUM" "3!0..60!1" \
       --separator=$'\n' \
       --width=400 \
       --center 2>/dev/null)
@@ -67,15 +67,12 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
         fi
       fi
 
-      # Schedule auto-delete
+      # Schedule auto-delete via systemd timer
       auto_delete=${auto_delete%.*}  # strip decimal from yad NUM field
       if [[ "$auto_delete" -gt 0 ]] 2>/dev/null; then
-        (
-          sleep $(( auto_delete * 60 ))
-          rm -f "$recorded_file"
-          [[ -f "${recorded_file%.mp4}--skipframes.mp4" ]] && rm -f "${recorded_file%.mp4}--skipframes.mp4"
-          notify-send "Recording deleted" "$(basename "$recorded_file")" -t 2000
-        ) &
+        skipfile="${recorded_file%.mp4}--skipframes.mp4"
+        delete_cmd="rm -f '$recorded_file' '$skipfile' && notify-send 'Recording deleted' '$(basename "$recorded_file")' -t 2000"
+        systemd-run --user --on-active="${auto_delete}m" bash -c "$delete_cmd"
       fi
     fi
   fi
