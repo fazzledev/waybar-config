@@ -18,17 +18,11 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
 
   # Prompt for rename and post-processing
   if [[ -n "$recorded_file" && -f "$recorded_file" ]]; then
-    new_name=$(zenity --entry \
-      --title="Save Screen Recording" \
-      --text="Enter a file name (max ${MAX_CHARS} characters):" \
-      --width=400 2>/dev/null)
+    result=$(python3 ~/.config/waybar/scripts/screenrecord_dialog.py 2>/dev/null)
 
     if [[ $? -eq 0 ]]; then
-      post_proc=$(zenity --list --checklist \
-        --title="Post-processing" \
-        --column="" --column="Option" \
-        FALSE "Skip frames" \
-        --width=300 --height=200 2>/dev/null)
+      new_name=$(echo "$result" | sed -n '1p')
+      skip_frames=$(echo "$result" | sed -n '2p')
 
       # Extract timestamp from original filename
       timestamp=$(basename "$recorded_file" .mp4 | sed 's/^screenrecording-//')
@@ -49,7 +43,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       fi
 
       # Apply post-processing
-      if [[ "$post_proc" == *"Skip frames"* ]]; then
+      if [[ "$skip_frames" == "1" ]]; then
         base="${recorded_file%.mp4}"
         output="${base}--skipframes.mp4"
         notify-send "Processing" "Applying frame skip..." -t 2000
