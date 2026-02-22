@@ -182,7 +182,7 @@
       "tooltip": false
     },
     "custom/screenrecording-indicator": {
-      "on-click": "omarchy-cmd-screenrecord",
+      "on-click": "~/.config/waybar/scripts/screenrecord_wrapper.sh",
       "exec": "~/.config/waybar/scripts/screen_recording.sh",
       "interval": 1,
       "signal": 8,
