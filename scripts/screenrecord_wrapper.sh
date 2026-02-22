@@ -22,7 +22,8 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       --title="Save Screen Recording" \
       --text="Max ${MAX_CHARS} characters" \
       --field="File name" "" \
-      --field="Skip frames:CHK" FALSE \
+      --field="Skip frames:CHK" TRUE \
+      --field="Copy to clipboard:CHK" TRUE \
       --separator=$'\n' \
       --width=400 \
       --center 2>/dev/null)
@@ -30,6 +31,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
     if [[ $? -eq 0 ]]; then
       new_name=$(echo "$result" | sed -n '1p')
       skip_frames=$(echo "$result" | sed -n '2p')
+      copy_clip=$(echo "$result" | sed -n '3p')
 
       # Extract timestamp from original filename
       timestamp=$(basename "$recorded_file" .mp4 | sed 's/^screenrecording-//')
@@ -50,6 +52,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       fi
 
       # Apply post-processing
+      clip_file="$recorded_file"
       if [[ "$skip_frames" == "TRUE" ]]; then
         base="${recorded_file%.mp4}"
         output="${base}--skipframes.mp4"
@@ -61,10 +64,14 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
             "$output" -y 2>/dev/null
           if [[ $? -eq 0 ]]; then
             notify-send "Frame skip complete" "$(basename "$output")" -t 2000
+            [[ "$copy_clip" == "TRUE" ]] && wl-copy < "$output"
           else
             notify-send "Frame skip failed" -u critical -t 3000
           fi
         ) &
+      elif [[ "$copy_clip" == "TRUE" ]]; then
+        wl-copy < "$recorded_file"
+        notify-send "Copied to clipboard" "$(basename "$recorded_file")" -t 2000
       fi
     fi
   fi
