@@ -24,7 +24,8 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       --field="File name" "" \
       --field="Skip frames:CHK" TRUE \
       --field="Copy path to clipboard:CHK" TRUE \
-      --field="Auto-delete after (minutes):NUM" "3!0..60!1" \
+      --field="Auto-delete:CHK" TRUE \
+      --field="Delete after (minutes):NUM" "3!1..60!1" \
       --separator=$'\n' \
       --width=400 \
       --center 2>/dev/null)
@@ -33,7 +34,8 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       new_name=$(echo "$result" | sed -n '1p')
       skip_frames=$(echo "$result" | sed -n '2p')
       copy_path=$(echo "$result" | sed -n '3p')
-      auto_delete=$(echo "$result" | sed -n '4p')
+      auto_delete_on=$(echo "$result" | sed -n '4p')
+      auto_delete=$(echo "$result" | sed -n '5p')
 
       # Extract timestamp from original filename
       timestamp=$(basename "$recorded_file" .mp4 | sed 's/^screenrecording-//')
@@ -78,7 +80,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
 
       # Schedule auto-delete via systemd timer
       auto_delete=${auto_delete%.*}  # strip decimal from yad NUM field
-      if [[ "$auto_delete" -gt 0 ]] 2>/dev/null; then
+      if [[ "$auto_delete_on" == "TRUE" && "$auto_delete" -gt 0 ]] 2>/dev/null; then
         skipfile="${recorded_file%.mp4}--skipframes.mp4"
         delete_cmd="rm -f '$recorded_file' '$skipfile' && notify-send 'Recording deleted' '$(basename "$recorded_file")' -t 2000"
         systemd-run --user --on-active="${auto_delete}m" bash -c "$delete_cmd"
