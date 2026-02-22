@@ -23,7 +23,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       --text="Max ${MAX_CHARS} characters" \
       --field="File name" "" \
       --field="Skip frames:CHK" TRUE \
-      --field="Copy to clipboard:CHK" TRUE \
+      --field="Auto-delete after (minutes):NUM" "0!0..60!1" \
       --separator=$'\n' \
       --width=400 \
       --center 2>/dev/null)
@@ -31,7 +31,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
     if [[ $? -eq 0 ]]; then
       new_name=$(echo "$result" | sed -n '1p')
       skip_frames=$(echo "$result" | sed -n '2p')
-      copy_clip=$(echo "$result" | sed -n '3p')
+      auto_delete=$(echo "$result" | sed -n '3p')
 
       # Extract timestamp from original filename
       timestamp=$(basename "$recorded_file" .mp4 | sed 's/^screenrecording-//')
@@ -52,26 +52,30 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       fi
 
       # Apply post-processing
-      clip_file="$recorded_file"
       if [[ "$skip_frames" == "TRUE" ]]; then
         base="${recorded_file%.mp4}"
         output="${base}--skipframes.mp4"
         notify-send "Processing" "Applying frame skip..." -t 2000
+        ffmpeg -i "$recorded_file" \
+          -vf "select='mod(n\,2)',setpts=N/FRAME_RATE/TB" \
+          -af "aselect='mod(n\,2)',asetpts=N/SR/TB" \
+          "$output" -y 2>/dev/null
+        if [[ $? -eq 0 ]]; then
+          notify-send "Frame skip complete" "$(basename "$output")" -t 2000
+        else
+          notify-send "Frame skip failed" -u critical -t 3000
+        fi
+      fi
+
+      # Schedule auto-delete
+      auto_delete=${auto_delete%.*}  # strip decimal from yad NUM field
+      if [[ "$auto_delete" -gt 0 ]] 2>/dev/null; then
         (
-          ffmpeg -i "$recorded_file" \
-            -vf "select='mod(n\,2)',setpts=N/FRAME_RATE/TB" \
-            -af "aselect='mod(n\,2)',asetpts=N/SR/TB" \
-            "$output" -y 2>/dev/null
-          if [[ $? -eq 0 ]]; then
-            notify-send "Frame skip complete" "$(basename "$output")" -t 2000
-            [[ "$copy_clip" == "TRUE" ]] && wl-copy < "$output"
-          else
-            notify-send "Frame skip failed" -u critical -t 3000
-          fi
+          sleep $(( auto_delete * 60 ))
+          rm -f "$recorded_file"
+          [[ -f "${recorded_file%.mp4}--skipframes.mp4" ]] && rm -f "${recorded_file%.mp4}--skipframes.mp4"
+          notify-send "Recording deleted" "$(basename "$recorded_file")" -t 2000
         ) &
-      elif [[ "$copy_clip" == "TRUE" ]]; then
-        wl-copy < "$recorded_file"
-        notify-send "Copied to clipboard" "$(basename "$recorded_file")" -t 2000
       fi
     fi
   fi
