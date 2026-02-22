@@ -61,11 +61,11 @@
 }
 
 #network {
-  margin: 0 7.5px;
+  margin: 0 9px 0 7.5px;
 }
 
 #backlight {
-  margin: 0 7.5px;
+  margin: 0 7.5px 0 9px;
 }
 
 #custom-expand-icon {
