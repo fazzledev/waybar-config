@@ -18,7 +18,14 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
 
   # Prompt for rename and post-processing
   if [[ -n "$recorded_file" && -f "$recorded_file" ]]; then
-    result=$(python3 ~/.config/waybar/scripts/screenrecord_dialog.py 2>/dev/null)
+    result=$(yad --form \
+      --title="Save Screen Recording" \
+      --text="Max ${MAX_CHARS} characters" \
+      --field="File name" "" \
+      --field="Skip frames:CHK" FALSE \
+      --separator=$'\n' \
+      --width=400 \
+      --center 2>/dev/null)
 
     if [[ $? -eq 0 ]]; then
       new_name=$(echo "$result" | sed -n '1p')
@@ -43,7 +50,7 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       fi
 
       # Apply post-processing
-      if [[ "$skip_frames" == "1" ]]; then
+      if [[ "$skip_frames" == "TRUE" ]]; then
         base="${recorded_file%.mp4}"
         output="${base}--skipframes.mp4"
         notify-send "Processing" "Applying frame skip..." -t 2000
