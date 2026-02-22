@@ -83,7 +83,9 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
       if [[ "$auto_delete_on" == "TRUE" && "$auto_delete" -gt 0 ]] 2>/dev/null; then
         skipfile="${recorded_file%.mp4}--skipframes.mp4"
         delete_cmd="rm -f '$recorded_file' '$skipfile' && notify-send 'Recording deleted' '$(basename "$recorded_file")' -t 2000"
-        systemd-run --user --on-active="${auto_delete}m" bash -c "$delete_cmd"
+        # Cancel any previous auto-delete timer
+        systemctl --user stop screenrecord-autodelete.timer 2>/dev/null
+        systemd-run --user --unit=screenrecord-autodelete --on-active="${auto_delete}m" bash -c "$delete_cmd"
       fi
     fi
   fi
