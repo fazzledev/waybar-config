@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Wrapper around omarchy-cmd-screenrecord that prompts for a filename after stopping.
+# Wrapper around omarchy-cmd-screenrecord that prompts for a filename
+# and post-processing options after stopping a recording.
 
 MAX_CHARS=50
 
@@ -15,29 +16,55 @@ if pgrep -f "^gpu-screen-recorder" >/dev/null; then
   # Stop the recording
   omarchy-cmd-screenrecord
 
-  # Prompt for rename
+  # Prompt for rename and post-processing
   if [[ -n "$recorded_file" && -f "$recorded_file" ]]; then
     new_name=$(zenity --entry \
       --title="Save Screen Recording" \
       --text="Enter a file name (max ${MAX_CHARS} characters):" \
-      --width=400 \
-      2>/dev/null)
+      --width=400 2>/dev/null)
 
-    if [[ $? -eq 0 && -n "$new_name" ]]; then
-      new_name="${new_name:0:$MAX_CHARS}"
-      new_name=$(echo "$new_name" | sed 's/[\/]//g; s/^[[:space:]]*//; s/[[:space:]]*$//')
+    if [[ $? -eq 0 ]]; then
+      post_proc=$(zenity --list --checklist \
+        --title="Post-processing" \
+        --column="" --column="Option" \
+        FALSE "Skip frames" \
+        --width=300 --height=200 2>/dev/null)
 
-      # Extract timestamp from original filename (e.g. 2025-02-22_14-30-00)
+      # Extract timestamp from original filename
       timestamp=$(basename "$recorded_file" .mp4 | sed 's/^screenrecording-//')
-      new_path="$OUTPUT_DIR/${new_name}_${timestamp}.mp4"
 
-      # Avoid overwriting existing files
-      if [[ -f "$new_path" ]]; then
-        new_path="$OUTPUT_DIR/${new_name}_${timestamp}_$(date +'%s').mp4"
+      # Rename if a name was provided
+      if [[ -n "$new_name" ]]; then
+        new_name="${new_name:0:$MAX_CHARS}"
+        new_name=$(echo "$new_name" | sed 's/[\/]//g; s/^[[:space:]]*//; s/[[:space:]]*$//')
+        new_path="$OUTPUT_DIR/${new_name}_${timestamp}.mp4"
+
+        if [[ -f "$new_path" ]]; then
+          new_path="$OUTPUT_DIR/${new_name}_${timestamp}_$(date +'%s').mp4"
+        fi
+
+        mv "$recorded_file" "$new_path"
+        recorded_file="$new_path"
+        notify-send "Recording saved" "$(basename "$new_path")" -t 2000
       fi
 
-      mv "$recorded_file" "$new_path"
-      notify-send "Recording saved" "$(basename "$new_path")" -t 2000
+      # Apply post-processing
+      if [[ "$post_proc" == *"Skip frames"* ]]; then
+        base="${recorded_file%.mp4}"
+        output="${base}--skipframes.mp4"
+        notify-send "Processing" "Applying frame skip..." -t 2000
+        (
+          ffmpeg -i "$recorded_file" \
+            -vf "select='mod(n\,2)',setpts=N/FRAME_RATE/TB" \
+            -af "aselect='mod(n\,2)',asetpts=N/SR/TB" \
+            "$output" -y 2>/dev/null
+          if [[ $? -eq 0 ]]; then
+            notify-send "Frame skip complete" "$(basename "$output")" -t 2000
+          else
+            notify-send "Frame skip failed" -u critical -t 3000
+          fi
+        ) &
+      fi
     fi
   fi
 else
