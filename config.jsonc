@@ -48,7 +48,11 @@
     ],
     "hyprland/workspaces": {
       "on-click": "activate",
-      "format": "{icon}",
+      "format": "{icon} {windows}",
+      "workspace-taskbar": {
+        "enable": true,
+        "icon-size": 14
+      },
       "format-icons": {
         "default": "",
         "0": "00", "1": "01", "2": "02", "3": "03", "4": "04",
